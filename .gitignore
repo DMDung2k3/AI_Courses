@@ -1,0 +1,19 @@
+# Môi trường Python
+__pycache__/
+*.py[cod]
+*$py.class
+ai_course_env/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Dữ liệu và mô hình
+*.pkl
+*.h5
+*.pth
+data/
+models/
+
+# Hệ điều hành
+.DS_Store
+Thumbs.db
