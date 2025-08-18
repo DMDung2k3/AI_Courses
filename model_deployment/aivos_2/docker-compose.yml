@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  face-detection-server:
+    build: .
+    container_name: face-detection-server
+    ports:
+      - "8080:8080"
+    volumes:
+      # Mount camera devices (for Linux/macOS)
+      - /dev:/dev
+      # Mount logs directory to persist data
+      - ./logs:/app/logs
+      # Optional: Mount config files
+      - ./config:/app/config
+    devices:
+      # Grant access to video devices (Linux)
+      - /dev/video0:/dev/video0
+    privileged: true  # Required for camera access
+    environment:
+      - PYTHONUNBUFFERED=1
+      - FLASK_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Add a separate client service for testing
+  face-detection-client:
+    build: .
+    container_name: face-detection-client
+    depends_on:
+      - face-detection-server
+    environment:
+      - SERVER_URL=http://face-detection-server:8080
+    command: ["python", "client.py"]
+    profiles: ["with-client"]  # Only run when explicitly requested
+
+# Optional: Add a network for isolation
+networks:
+  default:
+    name: face-detection-network
